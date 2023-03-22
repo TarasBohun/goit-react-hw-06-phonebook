@@ -1,56 +1,48 @@
-import { useEffect, useState } from 'react';
 import { FormContacts } from './FormContacts';
 import { Contacts } from './Contacts';
 import { Filter } from './Filter';
-
 import { GlobalStyle } from './GlobalStyles';
 import { Container } from './Container';
 
-const getInitialConatcts = () => {
-  const savedContacts = localStorage.getItem('contacts');
-  if (savedContacts !== null) {
-    const parcedContacts = JSON.parse(savedContacts);
-    return parcedContacts;
-  }
-  return [
-    { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-    { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-    { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-    { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-  ];
-};
+import { useSelector, useDispatch } from 'react-redux';
+
+import {
+  addContact,
+  deleteContact,
+  filterContacts,
+  getContactsValue,
+  getFilterValue,
+} from 'redux/contactSlice';
 
 export const App = () => {
-  const [contacts, setContacts] = useState(getInitialConatcts);
-  const [filter, setFilter] = useState('');
+  const dispatch = useDispatch();
+  const contactsValue = useSelector(getContactsValue);
+  const filterValue = useSelector(getFilterValue);
 
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
-
-  const addContact = newContact => {
+  const addNewContact = newContact => {
     if (
-      contacts.find(
+      contactsValue.find(
         contact => contact.name.toLowerCase() === newContact.name.toLowerCase()
       )
     ) {
       alert(`${newContact.name} is already in contacts`);
       return;
     }
-    setContacts(prev => [...prev, newContact]);
+
+    dispatch(addContact(newContact));
   };
 
   const onDeleteContact = contactId => {
-    setContacts(prev => prev.filter(contact => contact.id !== contactId));
+    dispatch(deleteContact(contactId));
   };
 
   const searchContacts = e => {
-    setFilter(e.currentTarget.value);
+    dispatch(filterContacts(e.currentTarget.value));
   };
 
   const getFilteredContacts = () => {
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(filter.toLowerCase())
+    return contactsValue.filter(contact =>
+      contact.name.toLowerCase().includes(filterValue.toLowerCase())
     );
   };
 
@@ -58,10 +50,10 @@ export const App = () => {
     <Container>
       <GlobalStyle />
       <h1>Phonebook</h1>
-      <FormContacts onSave={addContact} />
+      <FormContacts onSave={addNewContact} />
 
       <h2>Contacts</h2>
-      <Filter value={filter} onChange={searchContacts} />
+      <Filter value={filterValue} onChange={searchContacts} />
       <Contacts contacts={getFilteredContacts()} onDelete={onDeleteContact} />
     </Container>
   );

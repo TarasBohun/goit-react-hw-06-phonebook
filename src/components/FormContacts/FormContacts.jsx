@@ -1,19 +1,7 @@
 import PropTypes from 'prop-types';
 import { Formik, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
 import { nanoid } from 'nanoid';
 import { FormField, Form } from './FormContacts.styled';
-
-const ContactsSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(2, 'Too Short!')
-    .max(20, 'Too Long!')
-    .required('Required'),
-  number: Yup.number()
-    // .min(6, 'Too Short!')
-    // .max(20, 'Too Long!')
-    .required('Required'),
-});
 
 export const FormContacts = ({ onSave }) => {
   return (
@@ -22,7 +10,6 @@ export const FormContacts = ({ onSave }) => {
         name: '',
         number: '',
       }}
-      validationSchema={ContactsSchema}
       onSubmit={(values, actions) => {
         onSave({
           ...values,
